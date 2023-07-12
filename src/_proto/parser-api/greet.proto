@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option csharp_namespace = "WebParser";
+
+package LeadGenerationManager;
+
+// The greeting service definition.
+service LeadGenerationManager {
+  rpc SendChatGptCommonMessage (stream SendChatGptCommonMessageRequest) returns (stream SendChatGptCommonMessageResponse);
+}
+
+message SendChatGptCommonMessageRequest{
+  uint32 userId = 1;
+  string message = 2;
+}
+
+message SendChatGptCommonMessageResponse {
+  ChatGptCommonMessageItem message = 1;
+}
+
+message ChatGptCommonMessageItem{
+  uint32 userId = 1;
+  string message = 2;
+  string date = 3;
+}
