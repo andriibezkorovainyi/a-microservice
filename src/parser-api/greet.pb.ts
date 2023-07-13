@@ -1,13 +1,14 @@
 /* eslint-disable */
 import { Metadata } from "@grpc/grpc-js";
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
+import { Observable, Subject } from "rxjs";
 
 export const protobufPackage = "LeadGenerationManager";
 
 export interface SendChatGptCommonMessageRequest {
   userId?: number | undefined;
   message?: string | undefined;
+  observables?: [Subject<any>, Observable<any>] | undefined;
 }
 
 export interface SendChatGptCommonMessageResponse {

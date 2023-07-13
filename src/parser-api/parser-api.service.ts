@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import {
   LEAD_GENERATION_MANAGER_SERVICE_NAME,
   LeadGenerationManagerClient,
@@ -8,9 +8,16 @@ import {
   SendChatGptCommonMessageResponse,
 } from './greet.pb';
 
+export type UserObservables = [
+  Subject<SendChatGptCommonMessageRequest>,
+  Observable<SendChatGptCommonMessageResponse>,
+  string,
+];
+
 @Injectable()
 export class ParserApiService implements OnModuleInit {
   private svc: LeadGenerationManagerClient;
+  public userObservables: Record<string, UserObservables> = {};
 
   @Inject(LEAD_GENERATION_MANAGER_SERVICE_NAME)
   private readonly grpcParserApiClientGrpc: ClientGrpc;
@@ -23,13 +30,32 @@ export class ParserApiService implements OnModuleInit {
   }
 
   public sendChatGptCommonMessage(
-    body: SendChatGptCommonMessageRequest,
+    requestObservable: Observable<SendChatGptCommonMessageRequest>,
   ): Observable<SendChatGptCommonMessageResponse> {
-    const requestStream = new Observable<SendChatGptCommonMessageRequest>(
-      (sub) => {
-        sub.next(body);
-      },
-    );
-    return this.svc.sendChatGptCommonMessage(requestStream);
+    return this.svc.sendChatGptCommonMessage(requestObservable);
+  }
+
+  public getObservablesByUserId(userId: number): UserObservables | undefined {
+    return this.userObservables[String(userId)];
+  }
+
+  public setObservablesByUserId(
+    userId: number,
+    observables: UserObservables,
+    clientId: string,
+  ): void {
+    this.userObservables[String(userId)] = observables;
+    this.userObservables[String(userId)][2] = clientId;
+  }
+
+  public deleteObservablesByClientId(clientId: string): void {
+    const userObservables = Object.entries(this.userObservables);
+
+    for (const [userId, observables] of userObservables) {
+      if (observables[2] === clientId) {
+        delete this.userObservables[userId];
+        break;
+      }
+    }
   }
 }

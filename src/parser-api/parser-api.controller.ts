@@ -22,6 +22,6 @@ export class ParserApiController {
   async sendChatGptCommonMessage(
     @Body() body: SendChatGptCommonMessageBodyRequestDto,
   ) {
-    return this.parserApiService.sendChatGptCommonMessage(body);
+    // return this.parserApiService.sendChatGptCommonMessage(body);
   }
 }

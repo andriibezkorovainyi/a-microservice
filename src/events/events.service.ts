@@ -2,6 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { SocketConnectedUserDto } from '../user/dto/socket-connected-user.dto';
+import { Observable, Subject } from 'rxjs';
+import {
+  SendChatGptCommonMessageRequest,
+  SendChatGptCommonMessageResponse,
+} from '../parser-api/greet.pb';
 //
 @Injectable()
 export class EventsService {
@@ -35,5 +40,19 @@ export class EventsService {
     );
     const users = await Promise.all(promises);
     return users.filter((u) => u !== null);
+  }
+
+  public async getSocketConnectionsByUserId(
+    userId: number,
+  ): Promise<SocketConnectedUserDto[]> {
+    const users = await this.getSocketConnectedUsers();
+    return users.filter((u) => u.userId === userId);
+  }
+
+  public async getSocketConnectionBySocketId(
+    socketId: string,
+  ): Promise<SocketConnectedUserDto[]> {
+    const users = await this.getSocketConnectedUsers();
+    return users.filter((u) => u.socketId === socketId);
   }
 }
