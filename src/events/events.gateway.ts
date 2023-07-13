@@ -33,7 +33,7 @@ export class EventsGateway
   ) {}
 
   async afterInit() {
-    // await this.eventsService.deleteSocketSession(null);
+    await this.eventsService.deleteSocketSession(null);
   }
 
   async handleDisconnect(client: Socket) {

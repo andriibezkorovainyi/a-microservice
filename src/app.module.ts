@@ -5,6 +5,8 @@ import { LoggerModule } from 'nestjs-pino';
 import pino from 'pino';
 import { ParserApiModule } from './parser-api/parser-api.module';
 import { EventsModule } from './events/events.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -12,6 +14,20 @@ import { EventsModule } from './events/events.module';
       isGlobal: true,
       envFilePath: ['.env.development.local', '.env.development', '.env'],
       load: [appConfig],
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      store: async () =>
+        redisStore({
+          // TODO: See this issue to track the progress of this upgrade. (https://github.com/dabroek/node-cache-manager-redis-store/issues/40)
+          socket: {
+            host: process.env.REDIS_HOST,
+            port: Number(process.env.REDIS_PORT),
+          },
+          database: Number(process.env.REDIS_DATABASE),
+        }),
     }),
     LoggerModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
