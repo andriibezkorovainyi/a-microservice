@@ -15,7 +15,7 @@ import {
   SendChatGptCommonMessageResponse,
 } from './greet.pb';
 import { ParserApiService, UserObservables } from './parser-api.service';
-import { Observer, Subject } from 'rxjs';
+import { BehaviorSubject, Observer, ReplaySubject, Subject } from 'rxjs';
 import { EventsService } from '../events/events.service';
 
 @WebSocketGateway()
@@ -46,8 +46,12 @@ export class ParserApiGateway implements OnGatewayDisconnect {
       body.userId,
     );
 
-    if (!userObservables) {
-      const requestObservable = new Subject<SendChatGptCommonMessageRequest>();
+    if (userObservables) {
+      const requestObservable = userObservables[0];
+      requestObservable.next(body);
+    } else {
+      const requestObservable =
+        new ReplaySubject<SendChatGptCommonMessageRequest>();
       const responseObservable =
         this.parserApiService.sendChatGptCommonMessage(requestObservable);
 
@@ -82,9 +86,9 @@ export class ParserApiGateway implements OnGatewayDisconnect {
         userObservables,
         client.id,
       );
-    }
 
-    userObservables[0].next(body);
+      requestObservable.next(body);
+    }
   }
 
   public async handleDisconnect(client: Socket): Promise<void> {

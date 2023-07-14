@@ -10,7 +10,10 @@ export const grpcParserApiOptions = {
   name: LEAD_GENERATION_MANAGER_SERVICE_NAME,
   transport: Transport.GRPC,
   options: {
-    url: process.env.GRPC_PARSER_API_SERVICE_HOST || 'localhost:50065',
+    url:
+      process.env.GRPC_PARSER_API_SERVICE_HOST ||
+      '10.0.11.95:8059' ||
+      'localhost:50065',
     package: [HEALTH_CHECK_PACKAGE_NAME, LEAD_GENERATION_MANAGER_PACKAGE_NAME],
     protoPath: [
       resolve(__dirname, '../_proto/health-check/health-check.proto'),

@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable, of, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, of, ReplaySubject, Subject } from 'rxjs';
 import {
   LEAD_GENERATION_MANAGER_SERVICE_NAME,
   LeadGenerationManagerClient,
@@ -9,7 +9,7 @@ import {
 } from './greet.pb';
 
 export type UserObservables = [
-  Subject<SendChatGptCommonMessageRequest>,
+  ReplaySubject<SendChatGptCommonMessageRequest>,
   Observable<SendChatGptCommonMessageResponse>,
   string,
 ];
